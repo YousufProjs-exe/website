@@ -5,13 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#40251d">
+
     <title>Admin | Meraj Sweets &amp; Bakery</title>
+
     <link rel="stylesheet" href="admin.css">
+
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="admin.js" defer></script>
 </head>
+
 <body>
+    <!-- Authentication -->
     <main id="authView" class="auth-page">
         <a href="index.html" class="brand">
             <span class="brand-icon">M</span>
@@ -24,6 +29,7 @@
         <section class="login-card">
             <p class="eyebrow">PRIVATE STAFF ACCESS</p>
             <h1>Welcome <em>back.</em></h1>
+
             <p class="muted">
                 Sign in using your authorized bakery admin account.
             </p>
@@ -62,6 +68,7 @@
         </section>
     </main>
 
+    <!-- Admin dashboard -->
     <div id="adminView" class="admin-layout" hidden>
         <aside class="sidebar">
             <a href="index.html" class="brand">
@@ -100,6 +107,14 @@
 
             <button
                 class="nav-item"
+                data-panel="cake-orders"
+                type="button"
+            >
+                Cake orders
+            </button>
+
+            <button
+                class="nav-item"
                 data-panel="settings"
                 type="button"
             >
@@ -108,6 +123,7 @@
 
             <div class="sidebar-bottom">
                 <span id="adminEmail">Administrator</span>
+
                 <button id="logoutButton" type="button">
                     Sign out
                 </button>
@@ -117,11 +133,15 @@
         <main class="dashboard">
             <header class="dashboard-header">
                 <div>
-                    <p class="eyebrow">MER AJ STORE CONTROL</p>
+                    <p class="eyebrow">MERAJ STORE CONTROL</p>
                     <h1 id="pageTitle">Overview</h1>
                 </div>
 
-                <a href="index.html" target="_blank" rel="noopener">
+                <a
+                    href="index.html"
+                    target="_blank"
+                    rel="noopener"
+                >
                     View storefront ↗
                 </a>
             </header>
@@ -134,10 +154,12 @@
                 hidden
             ></p>
 
+            <!-- Overview -->
             <section id="overviewPanel" class="panel">
                 <div class="welcome-card">
                     <p class="eyebrow">YOUR BUSINESS, AT A GLANCE</p>
                     <h2>Welcome to your store.</h2>
+
                     <p>
                         Manage your products and keep your online menu updated.
                     </p>
@@ -163,6 +185,7 @@
                 <section class="content-card">
                     <div>
                         <h2>Manage your menu</h2>
+
                         <p class="muted">
                             Add products, upload images, change prices,
                             or mark products unavailable.
@@ -175,6 +198,7 @@
                 </section>
             </section>
 
+            <!-- Products -->
             <section id="productsPanel" class="panel" hidden>
                 <div class="section-heading">
                     <div>
@@ -195,7 +219,10 @@
                         aria-label="Search products"
                     >
 
-                    <select id="productFilter" aria-label="Filter products">
+                    <select
+                        id="productFilter"
+                        aria-label="Filter products"
+                    >
                         <option value="all">All products</option>
                         <option value="available">Available</option>
                         <option value="unavailable">Unavailable</option>
@@ -230,19 +257,67 @@
                 </div>
             </section>
 
+            <!-- Regular orders -->
             <section id="ordersPanel" class="panel" hidden>
                 <div class="content-card">
                     <h2>Orders</h2>
+
                     <p class="muted">
-                        Order management will be connected after the product
-                        workflow is working.
+                        Regular order management will be connected
+                        in a later step.
                     </p>
                 </div>
             </section>
 
+            <!-- Custom cake orders -->
+            <section id="cake-ordersPanel" class="panel" hidden>
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">CUSTOM CAKE ENQUIRIES</p>
+                        <h2>Cake orders</h2>
+
+                        <p class="muted">
+                            Review customer requests and update their progress.
+                        </p>
+                    </div>
+
+                    <button
+                        id="refreshCakeOrdersButton"
+                        type="button"
+                    >
+                        Refresh
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="cake-orders-table">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Cake details</th>
+                                <th>Preferred date</th>
+                                <th>Reference image</th>
+                                <th>Status &amp; staff notes</th>
+                                <th>Submitted</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="cakeOrdersTable">
+                            <tr>
+                                <td colspan="6" class="table-empty">
+                                    Cake requests will appear here.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Store settings -->
             <section id="settingsPanel" class="panel" hidden>
                 <div class="content-card">
                     <h2>Store settings</h2>
+
                     <p class="muted">
                         Store hours and delivery settings will be connected
                         in a later step.
@@ -252,6 +327,7 @@
         </main>
     </div>
 
+    <!-- Add/edit product dialog -->
     <dialog id="productDialog">
         <form id="productForm">
             <div class="dialog-heading dialog-header">
@@ -308,17 +384,28 @@
             <p id="imageStatus" class="muted"></p>
 
             <label class="checkbox-label">
-                <input id="productAvailable" type="checkbox" checked>
+                <input
+                    id="productAvailable"
+                    type="checkbox"
+                    checked
+                >
                 Available to order
             </label>
 
             <label class="checkbox-label">
-                <input id="productVisible" type="checkbox" checked>
+                <input
+                    id="productVisible"
+                    type="checkbox"
+                    checked
+                >
                 Show on storefront
             </label>
 
             <label class="checkbox-label">
-                <input id="productFeatured" type="checkbox">
+                <input
+                    id="productFeatured"
+                    type="checkbox"
+                >
                 Featured product
             </label>
 
@@ -337,7 +424,10 @@
                     Cancel
                 </button>
 
-                <button id="saveProductButton" type="submit">
+                <button
+                    id="saveProductButton"
+                    type="submit"
+                >
                     Save product
                 </button>
             </div>

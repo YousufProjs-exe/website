@@ -9,6 +9,16 @@ const STORAGE_BUCKET = CONFIG.storageBucket || "product-images";
 const TABLE_PRODUCTS = "products";
 const TABLE_CATEGORIES = "categories";
 const TABLE_ADMIN_PROFILES = "admin_profiles";
+const TABLE_CAKE_REQUESTS = "custom_cake_requests";
+
+const CAKE_STATUSES = [
+  "New",
+  "Reviewing",
+  "Awaiting customer",
+  "Confirmed",
+  "Completed",
+  "Cancelled"
+];
 
 const authView = document.getElementById("authView");
 const adminView = document.getElementById("adminView");
@@ -17,6 +27,7 @@ const loginButton = document.getElementById("loginButton");
 const authMessage = document.getElementById("authMessage");
 const logoutButton = document.getElementById("logoutButton");
 const adminEmail = document.getElementById("adminEmail");
+const globalMessage = document.getElementById("globalMessage");
 
 const statProducts = document.getElementById("statProducts");
 const statAvailable = document.getElementById("statAvailable");
@@ -43,12 +54,20 @@ const productFeatured = document.getElementById("productFeatured");
 const formMessage = document.getElementById("formMessage");
 const saveProductButton = document.getElementById("saveProductButton");
 
+const cakeOrdersTable = document.getElementById("cakeOrdersTable");
+const refreshCakeOrdersButton = document.getElementById(
+  "refreshCakeOrdersButton"
+);
+
 let supabaseClient = null;
 let currentUser = null;
 let currentAdminProfile = null;
 let products = [];
 let categories = [];
+let cakeRequests = [];
 let isSavingProduct = false;
+let isSavingCakeRequest = false;
+let isLoadingCakeRequests = false;
 let currentImageUrl = "";
 let currentImageFile = null;
 
@@ -82,14 +101,6 @@ function getErrorMessage(error) {
   return error?.message || "Something went wrong. Please try again.";
 }
 
-function formatRupees(paise) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 2
-  }).format(Number(paise || 0) / 100);
-}
-
 function escapeHTML(value) {
   const replacements = {
     "&": "&amp;",
@@ -99,7 +110,17 @@ function escapeHTML(value) {
     "'": "&#39;"
   };
 
-  return String(value ?? "").replace(/[&<>"']/g, character => replacements[character]);
+  return String(value ?? "").replace(/[&<>"']/g, character => {
+    return replacements[character];
+  });
+}
+
+function formatRupees(paise) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 2
+  }).format(Number(paise || 0) / 100);
 }
 
 function showAuth() {
@@ -152,6 +173,18 @@ function isValidImageUrl(value) {
   }
 }
 
+function getProductById(id) {
+  return products.find(product => String(product.id) === String(id)) || null;
+}
+
+function getCategoryById(id) {
+  return categories.find(category => String(category.id) === String(id)) || null;
+}
+
+function getCategoryName(categoryId) {
+  return getCategoryById(categoryId)?.name || "Uncategorized";
+}
+
 async function initializeAdmin() {
   if (
     !SUPABASE_URL ||
@@ -160,6 +193,7 @@ async function initializeAdmin() {
     typeof window.supabase.createClient !== "function"
   ) {
     showAuth();
+
     setMessage(
       authMessage,
       "Supabase configuration is missing. Check config.js and the Supabase library script.",
@@ -196,6 +230,7 @@ async function initializeAdmin() {
       currentAdminProfile = null;
       products = [];
       categories = [];
+      cakeRequests = [];
       showAuth();
       return;
     }
@@ -269,6 +304,7 @@ async function verifyAdmin(user) {
       await supabaseClient.auth.signOut();
 
       showAuth();
+
       setMessage(
         authMessage,
         "This account does not have admin access. Add its user ID to admin_profiles.",
@@ -290,6 +326,7 @@ async function verifyAdmin(user) {
     await loadDashboardData();
   } catch (error) {
     showAuth();
+
     setMessage(
       authMessage,
       "Could not verify admin access: " + getErrorMessage(error),
@@ -312,6 +349,7 @@ async function handleLogout() {
     currentAdminProfile = null;
     products = [];
     categories = [];
+    cakeRequests = [];
 
     showAuth();
   } catch (error) {
@@ -334,17 +372,31 @@ function activatePanel(panelName) {
     }
   });
 
-  document.querySelectorAll(".admin-panel").forEach(panel => {
-    const active =
-      panel.id === panelName ||
-      panel.id === `${panelName}Panel` ||
-      panel.id === `panel-${panelName}`;
-
-    panel.classList.toggle("active", active);
-    panel.hidden = !active;
+  document.querySelectorAll(".panel").forEach(panel => {
+    panel.hidden = panel.id !== `${panelName}Panel`;
   });
 
-  if (panelName === "products") renderProducts();
+  const pageTitle = document.getElementById("pageTitle");
+
+  const titles = {
+    overview: "Overview",
+    products: "Products",
+    orders: "Orders",
+    "cake-orders": "Cake Orders",
+    settings: "Store settings"
+  };
+
+  if (pageTitle) {
+    pageTitle.textContent = titles[panelName] || "Overview";
+  }
+
+  if (panelName === "products") {
+    renderProducts();
+  }
+
+  if (panelName === "cake-orders") {
+    loadCakeRequests();
+  }
 }
 
 function setupNavigation() {
@@ -356,12 +408,18 @@ function setupNavigation() {
 }
 
 async function loadDashboardData() {
-  await Promise.all([loadCategories(), loadProducts()]);
+  await Promise.all([
+    loadCategories(),
+    loadProducts()
+  ]);
+
   updateStats();
   renderProducts();
 }
 
 async function loadCategories() {
+  if (!supabaseClient) return;
+
   const { data, error } = await supabaseClient
     .from(TABLE_CATEGORIES)
     .select("id, name, sort_order, visible")
@@ -370,6 +428,7 @@ async function loadCategories() {
 
   if (error) {
     console.error("Category loading failed:", error);
+
     categories = [];
     populateCategoryOptions();
 
@@ -382,15 +441,18 @@ async function loadCategories() {
     return;
   }
 
-  categories = data || [];
+  categories = Array.isArray(data) ? data : [];
   populateCategoryOptions();
 }
 
 async function loadProducts() {
-  if (!productsTable) return;
+  if (!productsTable || !supabaseClient) return;
 
-  productsTable.innerHTML =
-    '<tr><td colspan="7" class="table-empty">Loading products...</td></tr>';
+  productsTable.innerHTML = `
+    <tr>
+      <td colspan="7" class="table-empty">Loading products...</td>
+    </tr>
+  `;
 
   const { data, error } = await supabaseClient
     .from(TABLE_PRODUCTS)
@@ -414,56 +476,68 @@ async function loadProducts() {
 
   if (error) {
     products = [];
-    productsTable.innerHTML =
-      '<tr><td colspan="7" class="table-empty">Could not load products. Check the console.</td></tr>';
+
+    productsTable.innerHTML = `
+      <tr>
+        <td colspan="7" class="table-empty">
+          Could not load products. Check the console.
+        </td>
+      </tr>
+    `;
 
     console.error("Product loading failed:", error);
     return;
   }
 
-  products = data || [];
+  products = Array.isArray(data) ? data : [];
 }
 
 function populateCategoryOptions(selectedId = "") {
   if (!productCategory) return;
 
-  const currentValue = selectedId || productCategory.value;
+  const currentValue = String(selectedId || productCategory.value || "");
 
-  productCategory.innerHTML =
-    '<option value="">Select a category</option>';
+  productCategory.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = categories.length
+    ? "Choose a category"
+    : "No categories found";
+
+  productCategory.appendChild(placeholder);
 
   categories.forEach(category => {
     const option = document.createElement("option");
-    option.value = category.id;
+
+    option.value = String(category.id);
     option.textContent = category.name;
     option.disabled = category.visible === false;
+
     productCategory.appendChild(option);
   });
 
-  if (categories.some(category => category.id === currentValue)) {
+  if (currentValue) {
     productCategory.value = currentValue;
   }
 }
 
 function updateStats() {
-  if (statProducts) statProducts.textContent = String(products.length);
+  if (statProducts) {
+    statProducts.textContent = String(products.length);
+  }
 
   if (statAvailable) {
     statAvailable.textContent = String(
-      products.filter(product => product.available).length
+      products.filter(product => product.available === true).length
     );
   }
 
   if (statFeatured) {
     statFeatured.textContent = String(
-      products.filter(product => product.featured).length
+      products.filter(product => product.featured === true).length
     );
   }
-}
-
-function getCategoryName(categoryId) {
-  return categories.find(category => category.id === categoryId)?.name ||
-    "Uncategorized";
 }
 
 function getFilteredProducts() {
@@ -479,11 +553,25 @@ function getFilteredProducts() {
 
     let matchesFilter = true;
 
-    if (filter === "available") matchesFilter = product.available === true;
-    if (filter === "unavailable") matchesFilter = product.available === false;
-    if (filter === "visible") matchesFilter = product.visible === true;
-    if (filter === "hidden") matchesFilter = product.visible === false;
-    if (filter === "featured") matchesFilter = product.featured === true;
+    if (filter === "available") {
+      matchesFilter = product.available === true;
+    }
+
+    if (filter === "unavailable") {
+      matchesFilter = product.available === false;
+    }
+
+    if (filter === "visible") {
+      matchesFilter = product.visible === true;
+    }
+
+    if (filter === "hidden") {
+      matchesFilter = product.visible === false;
+    }
+
+    if (filter === "featured") {
+      matchesFilter = product.featured === true;
+    }
 
     return matchesSearch && matchesFilter;
   });
@@ -502,10 +590,12 @@ function renderProducts() {
         </td>
       </tr>
     `;
+
     return;
   }
 
   productsTable.innerHTML = filteredProducts.map(product => {
+    const safeId = escapeHTML(product.id);
     const safeName = escapeHTML(product.name);
     const safeCategory = escapeHTML(getCategoryName(product.category_id));
 
@@ -543,8 +633,8 @@ function renderProducts() {
         <td>${safeCategory}</td>
         <td>
           <div class="table-actions">
-            <button type="button" data-edit-product="${escapeHTML(product.id)}">Edit</button>
-            <button type="button" data-delete-product="${escapeHTML(product.id)}" class="text-danger">Delete</button>
+            <button type="button" data-edit-product="${safeId}">Edit</button>
+            <button type="button" data-delete-product="${safeId}" class="text-danger">Delete</button>
           </div>
         </td>
       </tr>
@@ -561,8 +651,13 @@ function openProductDialog(product = null) {
   currentImageFile = null;
   currentImageUrl = product?.image_url || "";
 
-  if (productId) productId.value = product?.id || "";
-  if (productName) productName.value = product?.name || "";
+  if (productId) {
+    productId.value = product ? String(product.id) : "";
+  }
+
+  if (productName) {
+    productName.value = product?.name || "";
+  }
 
   if (productPrice) {
     productPrice.value = product
@@ -575,11 +670,15 @@ function openProductDialog(product = null) {
   }
 
   if (productAvailable) {
-    productAvailable.checked = product ? product.available === true : true;
+    productAvailable.checked = product
+      ? product.available === true
+      : true;
   }
 
   if (productVisible) {
-    productVisible.checked = product ? product.visible === true : true;
+    productVisible.checked = product
+      ? product.visible === true
+      : true;
   }
 
   if (productFeatured) {
@@ -596,10 +695,13 @@ function openProductDialog(product = null) {
   }
 
   const title = productDialog.querySelector(".dialog-header h2");
-  if (title) title.textContent = product ? "Edit product" : "Add product";
+
+  if (title) {
+    title.textContent = product ? "Edit product" : "Add product";
+  }
 
   if (typeof productDialog.showModal === "function") {
-    productDialog.showModal();
+    if (!productDialog.open) productDialog.showModal();
   } else {
     productDialog.setAttribute("open", "");
   }
@@ -609,7 +711,7 @@ function closeProductDialog() {
   if (!productDialog) return;
 
   if (typeof productDialog.close === "function") {
-    productDialog.close();
+    if (productDialog.open) productDialog.close();
   } else {
     productDialog.removeAttribute("open");
   }
@@ -617,6 +719,8 @@ function closeProductDialog() {
 
 function handleImageChange() {
   if (!productImage) return;
+
+  setMessage(formMessage, "");
 
   if (isFileInput(productImage)) {
     currentImageFile = productImage.files?.[0] || null;
@@ -627,12 +731,14 @@ function handleImageChange() {
           ? "Current image saved."
           : "No image selected.";
       }
+
       return;
     }
 
     if (!currentImageFile.type.startsWith("image/")) {
       currentImageFile = null;
       productImage.value = "";
+
       setMessage(formMessage, "Please select an image file.", "error");
       return;
     }
@@ -640,6 +746,7 @@ function handleImageChange() {
     if (currentImageFile.size > 5 * 1024 * 1024) {
       currentImageFile = null;
       productImage.value = "";
+
       setMessage(formMessage, "Image must be 5 MB or smaller.", "error");
       return;
     }
@@ -654,19 +761,28 @@ function handleImageChange() {
   const url = productImage.value.trim();
 
   if (url && !isValidImageUrl(url)) {
-    setMessage(formMessage, "Enter a valid HTTP or HTTPS image URL.", "error");
+    setMessage(
+      formMessage,
+      "Enter a valid HTTP or HTTPS image URL.",
+      "error"
+    );
+
     return;
   }
 
   currentImageUrl = url;
 
   if (imageStatus) {
-    imageStatus.textContent = url ? "Image URL entered." : "No image selected.";
+    imageStatus.textContent = url
+      ? "Image URL entered."
+      : "No image selected.";
   }
 }
 
 async function uploadProductImage(file) {
-  if (!file) return currentImageUrl || getProductImageValue();
+  if (!file) {
+    return currentImageUrl || getProductImageValue() || null;
+  }
 
   if (!file.type.startsWith("image/")) {
     throw new Error("The selected file is not an image.");
@@ -712,7 +828,12 @@ async function handleProductSave(event) {
   event.preventDefault();
 
   if (!supabaseClient || !currentUser || !currentAdminProfile) {
-    setMessage(formMessage, "Sign in with an authorized admin account.", "error");
+    setMessage(
+      formMessage,
+      "Sign in with an authorized admin account.",
+      "error"
+    );
+
     return;
   }
 
@@ -724,6 +845,7 @@ async function handleProductSave(event) {
   const rupeeValue = Number(productPrice?.value);
   const imageFile = getSelectedImageFile();
   const imageUrl = getProductImageValue();
+  const existingId = productId?.value.trim() || "";
 
   if (!name) {
     setMessage(formMessage, "Enter a product name.", "error");
@@ -737,14 +859,32 @@ async function handleProductSave(event) {
     return;
   }
 
-  if (!Number.isFinite(rupeeValue) || rupeeValue < 0 || rupeeValue > 10000000) {
+  if (!getCategoryById(categoryId)) {
+    setMessage(formMessage, "The selected category no longer exists. Reload categories and try again.", "error");
+    return;
+  }
+
+  if (
+    !Number.isFinite(rupeeValue) ||
+    rupeeValue < 0 ||
+    rupeeValue > 10000000
+  ) {
     setMessage(formMessage, "Enter a valid price in rupees.", "error");
     productPrice?.focus();
     return;
   }
 
-  if (!isFileInput(productImage) && imageUrl && !isValidImageUrl(imageUrl)) {
-    setMessage(formMessage, "Enter a valid HTTP or HTTPS image URL.", "error");
+  if (
+    !isFileInput(productImage) &&
+    imageUrl &&
+    !isValidImageUrl(imageUrl)
+  ) {
+    setMessage(
+      formMessage,
+      "Enter a valid HTTP or HTTPS image URL.",
+      "error"
+    );
+
     return;
   }
 
@@ -756,8 +896,6 @@ async function handleProductSave(event) {
     const uploadedImageUrl = imageFile
       ? await uploadProductImage(imageFile)
       : imageUrl || currentImageUrl || null;
-
-    const existingId = productId?.value.trim() || "";
 
     const payload = {
       category_id: categoryId,
@@ -779,7 +917,7 @@ async function handleProductSave(event) {
         .update(payload)
         .eq("id", existingId)
         .select("id")
-        .single();
+        .maybeSingle();
     } else {
       result = await supabaseClient
         .from(TABLE_PRODUCTS)
@@ -790,14 +928,23 @@ async function handleProductSave(event) {
 
     if (result.error) throw result.error;
 
+    if (existingId && !result.data) {
+      throw new Error(
+        "The product was not updated. It may have been deleted or you may not have permission to update it."
+      );
+    }
+
     closeProductDialog();
+
     await loadProducts();
     updateStats();
     renderProducts();
 
     setMessage(
-      authMessage,
-      existingId ? "Product updated successfully." : "Product added successfully.",
+      globalMessage || authMessage,
+      existingId
+        ? "Product updated successfully."
+        : "Product added successfully.",
       "success"
     );
   } catch (error) {
@@ -810,45 +957,338 @@ async function handleProductSave(event) {
 
 function handleProductTableClick(event) {
   const button = event.target.closest("button");
-  if (!button) return;
+
+  if (!button || !productsTable?.contains(button)) return;
 
   const editId = button.dataset.editProduct;
   const deleteId = button.dataset.deleteProduct;
 
-  if (editId) {
-    const product = products.find(item => item.id === editId);
-    if (product) openProductDialog(product);
+  if (editId !== undefined) {
+    const product = getProductById(editId);
+
+    if (product) {
+      openProductDialog(product);
+    } else {
+      setMessage(
+        globalMessage || authMessage,
+        "That product could not be found. Refresh the product list.",
+        "error"
+      );
+    }
+
+    return;
   }
 
-  if (deleteId) deleteProduct(deleteId);
+  if (deleteId !== undefined) {
+    deleteProduct(deleteId, button);
+  }
 }
 
-async function deleteProduct(id) {
-  if (!currentUser || !currentAdminProfile) {
+async function deleteProduct(id, button = null) {
+  if (!supabaseClient || !currentUser || !currentAdminProfile) {
     alert("You must be signed in as an admin.");
     return;
   }
 
-  const product = products.find(item => item.id === id);
-  if (!product) return;
+  const product = getProductById(id);
 
-  if (!window.confirm(`Delete "${product.name}" permanently? This cannot be undone.`)) {
+  if (!product) {
+    setMessage(
+      globalMessage || authMessage,
+      "That product could not be found. Refresh the product list.",
+      "error"
+    );
+
     return;
   }
 
+  const confirmed = window.confirm(
+    `Delete "${product.name}" permanently? This cannot be undone.`
+  );
+
+  if (!confirmed) return;
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Deleting...";
+  }
+
   try {
-    const { error } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from(TABLE_PRODUCTS)
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .select("id");
 
     if (error) throw error;
 
-    products = products.filter(item => item.id !== id);
+    if (!data || data.length === 0) {
+      throw new Error(
+        "No product was deleted. Check your admin permissions and Supabase delete policies."
+      );
+    }
+
+    products = products.filter(item => String(item.id) !== String(id));
+
     updateStats();
     renderProducts();
+
+    setMessage(
+      globalMessage || authMessage,
+      "Product deleted successfully.",
+      "success"
+    );
   } catch (error) {
     alert("Could not delete product: " + getErrorMessage(error));
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Delete";
+    }
+  }
+}
+
+function formatCakeDate(value) {
+  if (!value) return "Not specified";
+
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function formatCakeTimestamp(value) {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
+  return date.toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  });
+}
+
+async function loadCakeRequests() {
+  if (!cakeOrdersTable || !supabaseClient) return;
+  if (isLoadingCakeRequests) return;
+
+  if (!currentUser || !currentAdminProfile) {
+    setMessage(
+      globalMessage || authMessage,
+      "Sign in with an authorized admin account to view cake orders.",
+      "error"
+    );
+
+    return;
+  }
+
+  isLoadingCakeRequests = true;
+  setButtonLoading(refreshCakeOrdersButton, true, "Refreshing...");
+
+  cakeOrdersTable.innerHTML = `
+    <tr>
+      <td colspan="6" class="table-empty">Loading cake requests...</td>
+    </tr>
+  `;
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(TABLE_CAKE_REQUESTS)
+      .select(`
+        id,
+        customer_name,
+        customer_phone,
+        cake_type,
+        size,
+        flavour,
+        message_on_cake,
+        preferred_date,
+        requirements,
+        reference_image_url,
+        status,
+        staff_notes,
+        created_at
+      `)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    cakeRequests = Array.isArray(data) ? data : [];
+    renderCakeRequests();
+  } catch (error) {
+    console.error("Could not load cake requests:", error);
+
+    cakeOrdersTable.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">
+          Could not load cake requests: ${escapeHTML(getErrorMessage(error))}
+        </td>
+      </tr>
+    `;
+  } finally {
+    isLoadingCakeRequests = false;
+    setButtonLoading(refreshCakeOrdersButton, false);
+  }
+}
+
+function renderCakeRequests() {
+  if (!cakeOrdersTable) return;
+
+  if (!cakeRequests.length) {
+    cakeOrdersTable.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">No cake requests found yet.</td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  cakeOrdersTable.innerHTML = cakeRequests.map(request => {
+    const id = escapeHTML(request.id);
+    const name = escapeHTML(request.customer_name || "Unnamed customer");
+    const phone = escapeHTML(request.customer_phone || "No phone");
+    const type = escapeHTML(request.cake_type || "Custom cake");
+    const size = escapeHTML(request.size || "Not specified");
+    const flavour = escapeHTML(request.flavour || "Not specified");
+    const message = escapeHTML(request.message_on_cake || "None");
+    const requirements = escapeHTML(request.requirements || "None");
+    const notes = escapeHTML(request.staff_notes || "");
+    const status = CAKE_STATUSES.includes(request.status)
+      ? request.status
+      : "New";
+
+    const imageLink = request.reference_image_url
+      ? `<a href="${escapeHTML(request.reference_image_url)}" target="_blank" rel="noopener noreferrer">View image ↗</a>`
+      : "No image";
+
+    const statusOptions = CAKE_STATUSES.map(option => `
+      <option value="${escapeHTML(option)}" ${option === status ? "selected" : ""}>
+        ${escapeHTML(option)}
+      </option>
+    `).join("");
+
+    return `
+      <tr data-cake-request="${id}">
+        <td>
+          <strong>${name}</strong>
+          <p>${phone}</p>
+        </td>
+        <td>
+          <strong>${type}</strong>
+          <p>Size: ${size}</p>
+          <p>Flavour: ${flavour}</p>
+          <p>Message: ${message}</p>
+          <p>Requirements: ${requirements}</p>
+        </td>
+        <td>${escapeHTML(formatCakeDate(request.preferred_date))}</td>
+        <td>${imageLink}</td>
+        <td>
+          <label>
+            Status
+            <select data-cake-status>
+              ${statusOptions}
+            </select>
+          </label>
+          <label>
+            Private staff notes
+            <textarea data-cake-notes rows="3" maxlength="2000" placeholder="Internal notes for staff">${notes}</textarea>
+          </label>
+          <button type="button" data-save-cake>Save changes</button>
+        </td>
+        <td>${escapeHTML(formatCakeTimestamp(request.created_at))}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+async function saveCakeRequest(button) {
+  if (isSavingCakeRequest) return;
+
+  if (!currentUser || !currentAdminProfile || !supabaseClient) {
+    alert("Sign in with an authorized admin account first.");
+    return;
+  }
+
+  const row = button.closest("[data-cake-request]");
+
+  if (!row) return;
+
+  const id = row.dataset.cakeRequest;
+  const statusInput = row.querySelector("[data-cake-status]");
+  const notesInput = row.querySelector("[data-cake-notes]");
+
+  if (!statusInput || !notesInput) return;
+
+  if (!CAKE_STATUSES.includes(statusInput.value)) {
+    alert("Select a valid cake request status.");
+    return;
+  }
+
+  isSavingCakeRequest = true;
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Saving...";
+
+  try {
+    const payload = {
+      status: statusInput.value,
+      staff_notes: notesInput.value.trim(),
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabaseClient
+      .from(TABLE_CAKE_REQUESTS)
+      .update(payload)
+      .eq("id", id)
+      .select("id")
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+      throw new Error(
+        "No cake request was updated. Check your admin update permissions and Supabase policies."
+      );
+    }
+
+    const request = cakeRequests.find(
+      item => String(item.id) === String(id)
+    );
+
+    if (request) {
+      request.status = payload.status;
+      request.staff_notes = payload.staff_notes;
+      request.updated_at = payload.updated_at;
+    }
+
+    setMessage(
+      globalMessage || authMessage,
+      "Cake request updated successfully.",
+      "success"
+    );
+  } catch (error) {
+    console.error("Could not save cake request:", error);
+
+    alert(
+      "Could not save the cake request.\n\n" + getErrorMessage(error)
+    );
+  } finally {
+    isSavingCakeRequest = false;
+    button.disabled = false;
+    button.textContent = originalText || "Save changes";
   }
 }
 
@@ -871,12 +1311,24 @@ function setupEventListeners() {
   productsTable?.addEventListener("click", handleProductTableClick);
   productImage?.addEventListener("change", handleImageChange);
 
+  refreshCakeOrdersButton?.addEventListener("click", loadCakeRequests);
+
+  cakeOrdersTable?.addEventListener("click", event => {
+    const button = event.target.closest("[data-save-cake]");
+
+    if (button && cakeOrdersTable.contains(button)) {
+      saveCakeRequest(button);
+    }
+  });
+
   document.querySelectorAll("[data-close-dialog]").forEach(button => {
     button.addEventListener("click", closeProductDialog);
   });
 
   productDialog?.addEventListener("click", event => {
-    if (event.target === productDialog) closeProductDialog();
+    if (event.target === productDialog) {
+      closeProductDialog();
+    }
   });
 
   productDialog?.addEventListener("close", () => {
