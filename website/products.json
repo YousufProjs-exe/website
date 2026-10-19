@@ -1,0 +1,822 @@
+[
+  {
+    "id": 1,
+    "category": "Cakes",
+    "name": "Strawberry Cake",
+    "price": 700,
+    "description": "Soft and sweet, this strawberry cake is a perfect treat for cake lovers.",
+    "image": "",
+    "available": true,
+    "featured": true
+  },
+  {
+    "id": 2,
+    "category": "Cakes",
+    "name": "Buter Scoth Cake",
+    "price": 650,
+    "description": "Indulge in a rich, buttery delight that melts in your mouth, offering a heavenly sweetness with every bite.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 3,
+    "category": "Cakes",
+    "name": "Almond Cake",
+    "price": 1100,
+    "description": "Indulge in a moist, nutty delight that offers a perfect balance of sweetness and rich flavor, making every bite irresistible.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 4,
+    "category": "Cakes",
+    "name": "Mango Cake",
+    "price": 1100,
+    "description": "A luscious and decadent cake bursting with the sweet and tropical flavor of ripe mangoes.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 5,
+    "category": "Cakes",
+    "name": "Plam Cake",
+    "price": 90,
+    "description": "Indulge in a moist and fluffy delight, layered with rich flavors that create a heavenly taste experience.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 6,
+    "category": "Cakes",
+    "name": "Lichi Cake",
+    "price": 1100,
+    "description": "Indulge in a delightful symphony of flavors, where moist layers meet succulent sweetness, creating a truly irresistible treat.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 7,
+    "category": "Cakes",
+    "name": "Pista Cake",
+    "price": 1100,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 8,
+    "category": "Cakes",
+    "name": "Choclate Cake",
+    "price": 1100,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 9,
+    "category": "Cakes",
+    "name": "Pinaapple Cake",
+    "price": 560,
+    "description": "Delight in the moist, tropical sweetness of this cake, where each bite bursts with luscious pineapple flavors.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 10,
+    "category": "Sweet",
+    "name": "Apricot Delight Box",
+    "price": 180,
+    "description": "A creamy and indulgent dessert featuring the delicate sweetness of apricots.",
+    "image": "",
+    "available": true,
+    "featured": true
+  },
+  {
+    "id": 11,
+    "category": "Meetha Ki Roti",
+    "name": "Double Ka Meetha Ki Roti",
+    "price": 140,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": true
+  },
+  {
+    "id": 12,
+    "category": "Cookies",
+    "name": "Slics Cake",
+    "price": 360,
+    "description": "Indulge in a delightful treat, featuring layers of soft, sweet goodness expertly baked to perfection.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 13,
+    "category": "Cookies",
+    "name": "Osmania Biscuits",
+    "price": 340,
+    "description": "Osmani biscuit is a shortbread kind of cookie with a balance of sweet and salty taste. These cookies melt in the mouth and can be accompanied with a cup of tea.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 14,
+    "category": "Cookies",
+    "name": "Badam Biscuits",
+    "price": 420,
+    "description": "An almond biscuit, or almond cookie, is a type of biscuit that is made with almonds.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 15,
+    "category": "Cookies",
+    "name": "Kaju Cholate Biscuits",
+    "price": 420,
+    "description": "Indulge in the rich, buttery goodness of these delightful cookies, featuring a perfect balance of nutty flavor and chocolatey decadence.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 16,
+    "category": "Cookies",
+    "name": "Rus Cake",
+    "price": 360,
+    "description": "Indulge in a delightful treat, perfectly baked to achieve a crisp exterior and a soft, sweet center.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 17,
+    "category": "Cookies",
+    "name": "Fruit Rus Cake",
+    "price": 360,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 18,
+    "category": "Cookies",
+    "name": "Dry Fruit Biscuits",
+    "price": 420,
+    "description": "Crunchy cookies infused with a medley of rich nuts and dried fruits, offering a delightful sweetness in every bite.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 19,
+    "category": "Cookies",
+    "name": "Cholate Biscuits",
+    "price": 420,
+    "description": "These chocolate biscuits are flaky, buttery and chocolatey — a wonderful twist on a traditional biscuit recipe.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 20,
+    "category": "Cookies",
+    "name": "Macron Biscuits",
+    "price": 420,
+    "description": "Delicate and colorful treats with a crisp shell and a luscious, creamy filling that melts in your mouth.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 21,
+    "category": "Cookies",
+    "name": "Kaju Biscuits",
+    "price": 420,
+    "description": "An easy and simple cookie recipe made with a combination of plain flour, ghee and cashew nut.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 22,
+    "category": "Cookies",
+    "name": "Fruit Biscuits",
+    "price": 420,
+    "description": "Delight in these sweet treats, featuring a perfect blend of fruity flavors and a satisfying crunch.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 23,
+    "category": "Cookies",
+    "name": "Chand Biscuits",
+    "price": 360,
+    "description": "Indulge in these delightful cookies, boasting a crisp exterior and a tender, buttery center that melts in your mouth.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 24,
+    "category": "Cookies",
+    "name": "Choco Chips Biscuits",
+    "price": 420,
+    "description": "Indulge in these delightful cookies, featuring a buttery base studded with rich, melty chocolate chips for a perfect sweet treat.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 25,
+    "category": "Cookies",
+    "name": "Namkeem Biscuits",
+    "price": 260,
+    "description": "Namkeen Kaju Biscuits are crunchy, spicy and melt-in-mouth cashew-shaped snacks.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 26,
+    "category": "Snacks",
+    "name": "Mutton Beef Wrap",
+    "price": 150,
+    "description": "Tender mutton and beef wrapped in a savory package, perfect for a satisfying snack anytime.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 27,
+    "category": "Snacks",
+    "name": "Chicken Toast Sandwich",
+    "price": 65,
+    "description": "Savor the delight of tender chicken layered between crispy toast, creating a mouthwatering snack experience.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 28,
+    "category": "Snacks",
+    "name": "Chicken 65 Roll",
+    "price": 110,
+    "description": "Tender chicken wrapped in a soft roll, bursting with flavorful Indian spices.",
+    "image": "",
+    "available": true,
+    "featured": true
+  },
+  {
+    "id": 29,
+    "category": "Snacks",
+    "name": "Tandoori Chicken Pizza",
+    "price": 250,
+    "description": "Deliciously marinated chicken on a crispy pizza crust, topped with a blend of flavorful spices.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 30,
+    "category": "Snacks",
+    "name": "Chicken Sandwich",
+    "price": 109,
+    "description": "Shredded chicken mixed with mayonnaise and seasonings and sandwiched between white and brown bread slices and grilled.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 31,
+    "category": "Snacks",
+    "name": "Egg Puff",
+    "price": 30,
+    "description": "Egg puffs are a popular snack sold in Indian bakeries. These delicious puff pastry pockets are made with hard-boiled eggs and a spicy onion filling.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 32,
+    "category": "Snacks",
+    "name": "Chicken Zinger Wrap",
+    "price": 135,
+    "description": "A savory and flavorful chicken wrap that will satisfy your cravings any time of the day.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 33,
+    "category": "Snacks",
+    "name": "Mutton Beef Pizza",
+    "price": 260,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 34,
+    "category": "Snacks",
+    "name": "Mutton Beef Burger",
+    "price": 130,
+    "description": "Juicy mutton and beef patty sandwiched between soft buns, a meat lover's dream come true.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 35,
+    "category": "Snacks",
+    "name": "Chicken Rumali Roll",
+    "price": 110,
+    "description": "Soft rumali roti rolled with tasty chicken filling, perfect for a quick bite.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 36,
+    "category": "Snacks",
+    "name": "Chicken Donet",
+    "price": 100,
+    "description": "Crispy, golden-brown morsels packed with tender chicken, offering an irresistible crunch and savory delight.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 37,
+    "category": "Snacks",
+    "name": "Veg Puff",
+    "price": 30,
+    "description": "Vegetable puff with a crisp and flaky outer layer and mixed vegetable stuffing.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 38,
+    "category": "Snacks",
+    "name": "Achari Chicken Pizza",
+    "price": 250,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 39,
+    "category": "Snacks",
+    "name": "Fine Biscuit",
+    "price": 13,
+    "description": "A classic biscuit that's perfect for tea-time or a quick snack anytime.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 40,
+    "category": "Snacks",
+    "name": "Chicken 65 Cup",
+    "price": 75,
+    "description": "Crispy, flavorful morsels of marinated chicken, perfectly seasoned for a delightful snack experience.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 41,
+    "category": "Snacks",
+    "name": "Chicken Zinger Burger",
+    "price": 130,
+    "description": "Crispy, juicy chicken patty topped with fresh lettuce and creamy mayo, sandwiched between soft burger buns.",
+    "image": "",
+    "available": true,
+    "featured": true
+  },
+  {
+    "id": 42,
+    "category": "Snacks",
+    "name": "Veg Pizza (Regular)",
+    "price": 190,
+    "description": "A delightful medley of fresh vegetables atop a golden crust, baked to perfection.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 43,
+    "category": "Snacks",
+    "name": "Only Cheese Pizza",
+    "price": 240,
+    "description": "A cheesy delight with a perfect blend of gooey, melted cheese on a crispy crust.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 44,
+    "category": "Snacks",
+    "name": "Mutton Beef Rumali",
+    "price": 140,
+    "description": "Soft rumali roti wrapped with hearty mutton and beef, perfect for a filling bite.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 45,
+    "category": "Snacks",
+    "name": "Chicken Desire Burger",
+    "price": 120,
+    "description": "Soft chicken patty layered in a tasty burger that's perfect for a filling snack.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 46,
+    "category": "Snacks",
+    "name": "Chicken Pizza (Regular)",
+    "price": 230,
+    "description": "Pizza dough topped with chicken, olives, green onion, mozzarella cheese and zesty sauces.",
+    "image": "",
+    "available": true,
+    "featured": true
+  },
+  {
+    "id": 47,
+    "category": "Snacks",
+    "name": "Chicken Girll Sandwich",
+    "price": 109,
+    "description": "Succulent grilled chicken nestled between toasty bread, delivering a delightful burst of flavor.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 48,
+    "category": "Snacks",
+    "name": "Chicken Tandoori Wrap",
+    "price": 135,
+    "description": "A juicy chicken wrap with tandoori flavors, perfect as a quick and tasty roll.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 49,
+    "category": "Snacks",
+    "name": "Chicken Puff",
+    "price": 42,
+    "description": "Chicken puff with chicken and potato filling inside a pastry shell.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 50,
+    "category": "Snacks",
+    "name": "Chicken Burger",
+    "price": 109,
+    "description": "Crispy seasoned chicken topped with melted cheese and fresh toppings in a soft roll.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 51,
+    "category": "Veg Snacks",
+    "name": "Veg. Sandwich",
+    "price": 95,
+    "description": "A delightful sandwich filled with an assortment of fresh vegetables.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 52,
+    "category": "Veg Snacks",
+    "name": "Veg. Burger",
+    "price": 95,
+    "description": "Juicy veggie patty layered with fresh toppings and sandwiched between a soft bun.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 53,
+    "category": "General Items",
+    "name": "Cream Donat",
+    "price": 30,
+    "description": "Soft and creamy, this tasty treat is perfect for your sweet cravings.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 54,
+    "category": "General Items",
+    "name": "Almond Mawa Slice Cake",
+    "price": 105,
+    "description": "Rich and decadent almond mawa slice cake.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 55,
+    "category": "General Items",
+    "name": "Maska Bun",
+    "price": 60,
+    "description": "A buttery bun filled with flavorful, savory meat.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 56,
+    "category": "General Items",
+    "name": "Kaju Mawa Slice Cake",
+    "price": 105,
+    "description": "A decadent slice of cake made with cashews, milk solids and eggs.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 57,
+    "category": "General Items",
+    "name": "Brownie Cake",
+    "price": 80,
+    "description": "A decadent and rich brownie cake.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 58,
+    "category": "General Items",
+    "name": "Cream Bun",
+    "price": 25,
+    "description": "Soft and tasty bun with a hint of egg.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 59,
+    "category": "General Items",
+    "name": "Round Fan Biscuit",
+    "price": 20,
+    "description": "A crispy and flaky biscuit shaped like a round fan.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 60,
+    "category": "General Items",
+    "name": "Red Velvet Swiss Roll",
+    "price": 80,
+    "description": "A decadent and rich red velvet Swiss roll.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 61,
+    "category": "General Items",
+    "name": "Jam Swiss Roll",
+    "price": 60,
+    "description": "A sweet jam-filled light and fluffy sponge cake.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 62,
+    "category": "General Items",
+    "name": "Chocolate Swiss Roll",
+    "price": 70,
+    "description": "A rich and moist chocolate Swiss roll.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 63,
+    "category": "General Items",
+    "name": "Malai Bun",
+    "price": 60,
+    "description": "Soft bun filled with rich and creamy malai chicken.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 64,
+    "category": "General Items",
+    "name": "Cup Cakes Tutti Frutti",
+    "price": 75,
+    "description": "Deliciously sweet and fruity cupcakes.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 65,
+    "category": "Cheese Pastries",
+    "name": "Mango Cheese Pastry",
+    "price": 160,
+    "description": "A delectable combination of sweet mango and creamy cheese in a pastry.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 66,
+    "category": "Cheese Pastries",
+    "name": "Oreo Chocolate Cheese Pastry",
+    "price": 160,
+    "description": "Rich, creamy cheese and crushed Oreo cookies wrapped in a flaky pastry crust.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 67,
+    "category": "Cheese Pastries",
+    "name": "Lotus Cheese Pastry",
+    "price": 160,
+    "description": "Flaky pastry filled with creamy cheese and delicate lotus flavor.",
+    "image": "",
+    "available": true,
+    "featured": true
+  },
+  {
+    "id": 68,
+    "category": "Cheese Pastries",
+    "name": "Chocolate Cheese Pastry",
+    "price": 160,
+    "description": "Soft and chocolaty pastry with a creamy cheese twist.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 69,
+    "category": "Cheese Pastries",
+    "name": "Red Velvet Cheese Pastry",
+    "price": 160,
+    "description": "A decadent and creamy cheese pastry with a rich red velvet twist.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 70,
+    "category": "French Fries",
+    "name": "French Fries",
+    "price": 130,
+    "description": "Crispy golden fries.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 71,
+    "category": "French Fries",
+    "name": "French Fries Peri Peri",
+    "price": 130,
+    "description": "Crispy French fries with a flavorful peri peri twist.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 72,
+    "category": "Salads",
+    "name": "Chicken Tandoori Salad",
+    "price": 170,
+    "description": "A flavorful salad featuring tender tandoori chicken.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 73,
+    "category": "Salads",
+    "name": "Veg. Salad",
+    "price": 140,
+    "description": "A refreshing mix of crisp, colorful vegetables tossed in a light and zesty dressing.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 74,
+    "category": "Salads",
+    "name": "Chicken Salad",
+    "price": 170,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 75,
+    "category": "Salads",
+    "name": "Chicken Crispy Salad",
+    "price": 170,
+    "description": "A crispy and tasty chicken salad, perfect for a light and satisfying meal.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 76,
+    "category": "Salads",
+    "name": "Chicken 65 Salad",
+    "price": 170,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 77,
+    "category": "Muharram Dum Ka Roast",
+    "name": "Dum Ka Road 500gm",
+    "price": 430,
+    "description": "Experience a rich medley of flavors and aromas, as tender ingredients are slow-cooked to perfection.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 78,
+    "category": "Muharram Dum Ka Roast",
+    "name": "Dum Ka Roat & Dry Fruits & Pure Ghee 1kg",
+    "price": 850,
+    "description": "Savor the rich, aromatic flavors of slow-cooked delicacies, enriched with dry fruits and pure ghee for a festive delight.",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 79,
+    "category": "Broasted Chicken",
+    "name": "Broasted Chicken — 2 Pc",
+    "price": 260,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": true
+  },
+  {
+    "id": 80,
+    "category": "Broasted Chicken",
+    "name": "Broasted Chicken — 4 Pc",
+    "price": 380,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 81,
+    "category": "Broasted Chicken",
+    "name": "Broasted Chicken — 6 Pc",
+    "price": 510,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  },
+  {
+    "id": 82,
+    "category": "Broasted Chicken",
+    "name": "Broasted Chicken — 8 Pc",
+    "price": 740,
+    "description": "",
+    "image": "",
+    "available": true,
+    "featured": false
+  }
+]

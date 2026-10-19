@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#40251d">
+
+    <title>Admin | Meraj Sweets & Bakery</title>
+
+    <link rel="stylesheet" href="admin.css">
+
+    <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="admin.js" defer></script>
+</head>
+<body>
+
+    <!-- ADMIN LOGIN -->
+    <main id="authView" class="auth-page">
+
+        <a href="index.html" class="brand">
+            <span class="brand-icon">M</span>
+            <span>
+                <strong>Meraj</strong>
+                <small>SWEETS &amp; BAKERY</small>
+            </span>
+        </a>
+        
+        <section class="login-card">
+            <p class="eyebrow">PRIVATE STAFF ACCESS</p>
+
+            <h1>Welcome <em>back.</em></h1>
+
+            <p class="muted">
+                Sign in using your authorized bakery admin account.
+            </p>
+
+            <form id="loginForm">
+                <label for="email">Email address</label>
+                <input
+                    id="email"
+                    type="email"
+                    autocomplete="username"
+                    placeholder="admin@example.com"
+                    required
+                >
+
+                <label for="password">Password</label>
+                <input
+                    id="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Your password"
+                    required
+                >
+
+                <button id="loginButton" type="submit">
+                    Sign in
+                </button>
+            </form>
+
+            <p id="authMessage" role="status" aria-live="polite">
+                Authorized accounts only.
+            </p>
+
+            <a class="back-link" href="index.html">
+                ← Return to the bakery
+            </a>
+        </section>
+
+    </main>
+
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminView" class="admin-layout" hidden>
+
+        <aside class="sidebar">
+
+            <a href="index.html" class="brand">
+                <span class="brand-icon">M</span>
+                <span>
+                    <strong>Meraj</strong>
+                    <small>STORE ADMIN</small>
+                </span>
+            </a>
+
+            <p class="sidebar-label">WORKSPACE</p>
+
+            <button
+                class="nav-item active"
+                data-panel="overview"
+                type="button"
+            >
+                Overview
+            </button>
+
+            <button
+                class="nav-item"
+                data-panel="products"
+                type="button"
+            >
+                Products
+            </button>
+
+            <button
+                class="nav-item"
+                data-panel="orders"
+                type="button"
+            >
+                Orders
+            </button>
+
+            <button
+                class="nav-item"
+                data-panel="settings"
+                type="button"
+            >
+                Store settings
+            </button>
+
+            <div class="sidebar-bottom">
+                <span id="adminEmail">Administrator</span>
+
+                <button id="logoutButton" type="button">
+                    Sign out
+                </button>
+            </div>
+
+        </aside>
+
+
+        <main class="dashboard">
+
+            <header class="dashboard-header">
+                <div>
+                    <p class="eyebrow">MER AJ STORE CONTROL</p>
+                    <h1 id="pageTitle">Overview</h1>
+                </div>
+
+                <a href="index.html" target="_blank" rel="noopener">
+                    View storefront ↗
+                </a>
+            </header>
+
+            <p
+                id="globalMessage"
+                class="status-message"
+                role="status"
+                aria-live="polite"
+                hidden
+            ></p>
+
+
+            <!-- OVERVIEW PANEL -->
+            <section id="overviewPanel" class="panel">
+
+                <div class="welcome-card">
+                    <p class="eyebrow">YOUR BUSINESS, AT A GLANCE</p>
+                    <h2>Welcome to your store.</h2>
+                    <p>
+                        Manage your products and keep your online menu updated.
+                    </p>
+                </div>
+
+                <div class="stats-grid">
+
+                    <article class="stat-card">
+                        <p>Total products</p>
+                        <strong id="statProducts">—</strong>
+                    </article>
+
+                    <article class="stat-card">
+                        <p>Available products</p>
+                        <strong id="statAvailable">—</strong>
+                    </article>
+
+                    <article class="stat-card">
+                        <p>Featured products</p>
+                        <strong id="statFeatured">—</strong>
+                    </article>
+
+                </div>
+
+                <section class="content-card">
+                    <div>
+                        <h2>Manage your menu</h2>
+                        <p class="muted">
+                            Add products, upload images, change prices,
+                            or mark products unavailable.
+                        </p>
+                    </div>
+
+                    <button id="addProductShortcut" type="button">
+                        + Add product
+                    </button>
+                </section>
+
+            </section>
+
+
+            <!-- PRODUCTS PANEL -->
+            <section id="productsPanel" class="panel" hidden>
+
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">YOUR CATALOGUE</p>
+                        <h2>Products</h2>
+                    </div>
+
+                    <button id="addProductButton" type="button">
+                        + Add product
+                    </button>
+                </div>
+
+                <div class="product-toolbar">
+                    <input
+                        id="productSearch"
+                        type="search"
+                        placeholder="Search products..."
+                        aria-label="Search products"
+                    >
+
+                    <select id="productFilter" aria-label="Filter products">
+                        <option value="all">All products</option>
+                        <option value="available">Available</option>
+                        <option value="unavailable">Unavailable</option>
+                        <option value="hidden">Hidden from store</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="productsTable">
+                            <tr>
+                                <td colspan="5">Loading products...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+
+
+            <!-- ORDERS PANEL: NEXT IMPLEMENTATION -->
+            <section id="ordersPanel" class="panel" hidden>
+                <div class="content-card">
+                    <h2>Orders</h2>
+                    <p class="muted">
+                        Order management will be connected after
+                        the product workflow is working.
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- SETTINGS PANEL: NEXT IMPLEMENTATION -->
+            <section id="settingsPanel" class="panel" hidden>
+                <div class="content-card">
+                    <h2>Store settings</h2>
+                    <p class="muted">
+                        Store hours and delivery settings will be
+                        connected in a later step.
+                    </p>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- ADD / EDIT PRODUCT -->
+    <dialog id="productDialog">
+
+        <form id="productForm">
+
+            <div class="dialog-heading">
+                <h2 id="dialogTitle">Add product</h2>
+
+                <button
+                    id="closeProductDialog"
+                    type="button"
+                    aria-label="Close dialog"
+                >
+                    ×
+                </button>
+            </div>
+
+            <input type="hidden" id="productId">
+
+            <label for="productName">Product name</label>
+            <input
+                id="productName"
+                type="text"
+                maxlength="120"
+                required
+            >
+
+            <label for="productCategory">Category</label>
+            <select id="productCategory" required>
+                <option value="">Choose a category</option>
+            </select>
+
+            <label for="productPrice">Price (₹)</label>
+            <input
+                id="productPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+            >
+
+            <label for="productDescription">Description</label>
+            <textarea
+                id="productDescription"
+                rows="3"
+                maxlength="600"
+            ></textarea>
+
+            <label for="productImage">Product image</label>
+            <input
+                id="productImage"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+            >
+
+            <p id="imageStatus" class="muted"></p>
+
+            <label class="checkbox-label">
+                <input id="productAvailable" type="checkbox" checked>
+                Available to order
+            </label>
+
+            <label class="checkbox-label">
+                <input id="productVisible" type="checkbox" checked>
+                Show on storefront
+            </label>
+
+            <label class="checkbox-label">
+                <input id="productFeatured" type="checkbox">
+                Featured product
+            </label>
+
+            <p
+                id="formMessage"
+                role="status"
+                aria-live="polite"
+            ></p>
+
+            <div class="dialog-actions">
+                <button id="cancelProduct" type="button">
+                    Cancel
+                </button>
+
+                <button id="saveProductButton" type="submit">
+                    Save product
+                </button>
+            </div>
+
+        </form>
+
+    </dialog>
+
+</body>
+</html>
