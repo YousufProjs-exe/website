@@ -5,20 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#40251d">
-
-    <title>Admin | Meraj Sweets & Bakery</title>
-
+    <title>Admin | Meraj Sweets &amp; Bakery</title>
     <link rel="stylesheet" href="admin.css">
-
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="admin.js" defer></script>
 </head>
 <body>
-
-    <!-- ADMIN LOGIN -->
     <main id="authView" class="auth-page">
-
         <a href="index.html" class="brand">
             <span class="brand-icon">M</span>
             <span>
@@ -26,29 +20,27 @@
                 <small>SWEETS &amp; BAKERY</small>
             </span>
         </a>
-        
+
         <section class="login-card">
             <p class="eyebrow">PRIVATE STAFF ACCESS</p>
-
             <h1>Welcome <em>back.</em></h1>
-
             <p class="muted">
                 Sign in using your authorized bakery admin account.
             </p>
 
             <form id="loginForm">
-                <label for="email">Email address</label>
+                <label for="loginEmail">Email address</label>
                 <input
-                    id="email"
+                    id="loginEmail"
                     type="email"
                     autocomplete="username"
                     placeholder="admin@example.com"
                     required
                 >
 
-                <label for="password">Password</label>
+                <label for="loginPassword">Password</label>
                 <input
-                    id="password"
+                    id="loginPassword"
                     type="password"
                     autocomplete="current-password"
                     placeholder="Your password"
@@ -68,15 +60,10 @@
                 ← Return to the bakery
             </a>
         </section>
-
     </main>
 
-
-    <!-- ADMIN DASHBOARD -->
     <div id="adminView" class="admin-layout" hidden>
-
         <aside class="sidebar">
-
             <a href="index.html" class="brand">
                 <span class="brand-icon">M</span>
                 <span>
@@ -121,17 +108,13 @@
 
             <div class="sidebar-bottom">
                 <span id="adminEmail">Administrator</span>
-
                 <button id="logoutButton" type="button">
                     Sign out
                 </button>
             </div>
-
         </aside>
 
-
         <main class="dashboard">
-
             <header class="dashboard-header">
                 <div>
                     <p class="eyebrow">MER AJ STORE CONTROL</p>
@@ -151,10 +134,7 @@
                 hidden
             ></p>
 
-
-            <!-- OVERVIEW PANEL -->
             <section id="overviewPanel" class="panel">
-
                 <div class="welcome-card">
                     <p class="eyebrow">YOUR BUSINESS, AT A GLANCE</p>
                     <h2>Welcome to your store.</h2>
@@ -164,7 +144,6 @@
                 </div>
 
                 <div class="stats-grid">
-
                     <article class="stat-card">
                         <p>Total products</p>
                         <strong id="statProducts">—</strong>
@@ -179,7 +158,6 @@
                         <p>Featured products</p>
                         <strong id="statFeatured">—</strong>
                     </article>
-
                 </div>
 
                 <section class="content-card">
@@ -195,13 +173,9 @@
                         + Add product
                     </button>
                 </section>
-
             </section>
 
-
-            <!-- PRODUCTS PANEL -->
             <section id="productsPanel" class="panel" hidden>
-
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">YOUR CATALOGUE</p>
@@ -225,7 +199,9 @@
                         <option value="all">All products</option>
                         <option value="available">Available</option>
                         <option value="unavailable">Unavailable</option>
+                        <option value="visible">Visible</option>
                         <option value="hidden">Hidden from store</option>
+                        <option value="featured">Featured</option>
                     </select>
                 </div>
 
@@ -234,63 +210,57 @@
                         <thead>
                             <tr>
                                 <th>Product</th>
-                                <th>Category</th>
                                 <th>Price</th>
-                                <th>Status</th>
+                                <th>Availability</th>
+                                <th>Visibility</th>
+                                <th>Featured</th>
+                                <th>Category</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
 
                         <tbody id="productsTable">
                             <tr>
-                                <td colspan="5">Loading products...</td>
+                                <td colspan="7" class="table-empty">
+                                    Loading products...
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-
             </section>
 
-
-            <!-- ORDERS PANEL: NEXT IMPLEMENTATION -->
             <section id="ordersPanel" class="panel" hidden>
                 <div class="content-card">
                     <h2>Orders</h2>
                     <p class="muted">
-                        Order management will be connected after
-                        the product workflow is working.
+                        Order management will be connected after the product
+                        workflow is working.
                     </p>
                 </div>
             </section>
 
-
-            <!-- SETTINGS PANEL: NEXT IMPLEMENTATION -->
             <section id="settingsPanel" class="panel" hidden>
                 <div class="content-card">
                     <h2>Store settings</h2>
                     <p class="muted">
-                        Store hours and delivery settings will be
-                        connected in a later step.
+                        Store hours and delivery settings will be connected
+                        in a later step.
                     </p>
                 </div>
             </section>
-
         </main>
-
     </div>
 
-
-    <!-- ADD / EDIT PRODUCT -->
     <dialog id="productDialog">
-
         <form id="productForm">
-
-            <div class="dialog-heading">
+            <div class="dialog-heading dialog-header">
                 <h2 id="dialogTitle">Add product</h2>
 
                 <button
                     id="closeProductDialog"
                     type="button"
+                    data-close-dialog
                     aria-label="Close dialog"
                 >
                     ×
@@ -359,7 +329,11 @@
             ></p>
 
             <div class="dialog-actions">
-                <button id="cancelProduct" type="button">
+                <button
+                    id="cancelProduct"
+                    type="button"
+                    data-close-dialog
+                >
                     Cancel
                 </button>
 
@@ -367,10 +341,7 @@
                     Save product
                 </button>
             </div>
-
         </form>
-
     </dialog>
-
 </body>
 </html>

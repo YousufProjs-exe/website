@@ -8,6 +8,6 @@ window.MERAJ_CONFIG = {
   instagram: "https://www.instagram.com/meraj_sweets_bakery/",
   deliveryFee: null, // Set a verified amount in rupees, or keep null until confirmed
   openingHours: "", // Add verified hours here
-  supabaseUrl: "https://supabase.com/dashboard/project/traumiyxgmutqpsvjdtr", // Supabase Project URL (public)
+  supabaseUrl: "https://traumiyxgmutqpsvjdtr.supabase.co",
   supabaseAnonKey: "sb_publishable_K2a6FjX-7NX1ZxgF3De4RQ_a06xsQbb" // Supabase anon/public key only; protect data with RLS policies
 };
