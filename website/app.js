@@ -8,7 +8,9 @@ let toastTimer;
 
 try {
   const savedCart = JSON.parse(localStorage.getItem("meraj-cart") || "{}");
-  if (savedCart && typeof savedCart === "object" && !Array.isArray(savedCart)) cart = savedCart;
+  if (savedCart && typeof savedCart === "object" && !Array.isArray(savedCart)) {
+    cart = savedCart;
+  }
 } catch {
   cart = {};
 }
@@ -195,6 +197,8 @@ function cardMarkup(product) {
 
 function renderChips() {
   const el = $("categoryChips");
+  if (!el) return;
+
   el.innerHTML = CATEGORIES.map(category => `
     <button class="category-chip ${activeCategory === category ? "active" : ""}" data-category="${safeText(category)}">${safeText(category)}</button>
   `).join("");
@@ -419,85 +423,77 @@ function handleCheckoutSubmit(event) {
   showToast("Summary prepared. Order not submitted.");
 }
 
-
 async function handleCakeSubmit(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const form = e.currentTarget;
-    const submitButton = form.querySelector('button[type="submit"]');
-    const note = document.getElementById("cakeFormNote");
+  const form = e.currentTarget;
+  const submitButton = form.querySelector('button[type="submit"]');
+  const note = $("cakeFormNote");
 
-    const config = window.MERAJ_CONFIG || {};
-    const supabaseUrl = config.supabaseUrl;
-    const supabaseKey = config.supabaseAnonKey;
+  const config = window.MERAJ_CONFIG || {};
+  const supabaseUrl = config.supabaseUrl;
+  const supabaseKey = config.supabaseAnonKey;
 
-    if (!supabaseUrl || !supabaseKey || !window.supabase?.createClient) {
-        note.textContent =
-            "Cake requests are temporarily unavailable. Please contact the bakery directly.";
-        return;
+  if (!supabaseUrl || !supabaseKey || !window.supabase?.createClient) {
+    note.textContent =
+      "Supabase configuration or library is missing. Check config.js and the Supabase script.";
+    return;
+  }
+
+  const data = formData(form);
+  const preferredDate = data.date || null;
+
+  if (preferredDate) {
+    const selectedDate = new Date(`${preferredDate}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (Number.isNaN(selectedDate.getTime()) || selectedDate < today) {
+      note.textContent = "Please choose today or a future date.";
+      return;
     }
+  }
 
-    const data = formData(form);
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = "Submitting request...";
+  note.textContent = "Sending your cake request...";
 
-    const preferredDate = data.date || null;
+  try {
+    const client = window.supabase.createClient(
+      supabaseUrl,
+      supabaseKey
+    );
 
-    if (preferredDate) {
-        const selectedDate = new Date(`${preferredDate}T00:00:00`);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+    const { error } = await client
+      .from("custom_cake_requests")
+      .insert({
+        customer_name: data.name.trim(),
+        customer_phone: data.phone.trim(),
+        cake_type: data.cakeType,
+        size: data.size.trim() || null,
+        flavour: data.flavour.trim() || null,
+        message_on_cake: data.message.trim() || null,
+        preferred_date: preferredDate,
+        requirements: data.requirements.trim() || null,
+        status: "New"
+      });
 
-        if (Number.isNaN(selectedDate.getTime()) || selectedDate < today) {
-            note.textContent = "Please choose today or a future date.";
-            return;
-        }
-    }
+    if (error) throw error;
 
-    const originalText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = "Submitting request...";
-    note.textContent = "Sending your cake request securely...";
+    note.textContent =
+      "Your cake request has been submitted successfully! The bakery team will review it and contact you to confirm availability and pricing.";
 
-    try {
-        const client = window.supabase.createClient(
-            supabaseUrl,
-            supabaseKey
-        );
-
-        const { error } = await client
-            .from("custom_cake_requests")
-            .insert({
-                customer_name: data.name.trim(),
-                customer_phone: data.phone.trim(),
-                cake_type: data.cakeType,
-                size: data.size.trim() || null,
-                flavour: data.flavour.trim() || null,
-                message_on_cake: data.message.trim() || null,
-                preferred_date: preferredDate,
-                requirements: data.requirements.trim() || null,
-                status: "New"
-            });
-
-        if (error) throw error;
-
-        note.textContent =
-            "Your cake request has been submitted successfully! " +
-            "The bakery team will review it and contact you to confirm availability and pricing.";
-
-        form.reset();
-
-        document.getElementById("cakeRequestSummary")?.remove();
-        showToast("Cake request submitted successfully.");
-    } catch (error) {
-        console.error("Cake request submission failed:", error);
-
-        note.textContent =
-            "We couldn't submit your request. Please try again later or contact the bakery directly.";
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = originalText;
-    }
+    form.reset();
+    showToast("Cake request submitted successfully.");
+  } catch (error) {
+    console.error("Cake request submission failed:", error);
+    note.textContent = `Submission failed: ${error.message || "Check your Supabase table and permissions."}`;
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
 }
-
 
 document.addEventListener("click", event => {
   const add = event.target.closest("[data-add]");
