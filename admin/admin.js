@@ -1142,76 +1142,174 @@ async function loadCakeRequests() {
   }
 }
 
+
 function renderCakeRequests() {
   if (!cakeOrdersTable) return;
 
   if (!cakeRequests.length) {
     cakeOrdersTable.innerHTML = `
       <tr>
-        <td colspan="6" class="table-empty">No cake requests found yet.</td>
+        <td colspan="6" class="table-empty">
+          No cake requests found yet.
+        </td>
       </tr>
     `;
-
     return;
+  }
+
+  function cleanDetail(value, fallback = "Not provided") {
+    if (value == null || value === "") return fallback;
+
+    const source = String(value)
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/(p|div|li|h[1-6]|blockquote)>/gi, "\n");
+
+    const parsed = new DOMParser().parseFromString(source, "text/html");
+
+    return (parsed.body.textContent || "")
+      .replace(/\n[ \t]+/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim() || fallback;
+  }
+
+  function detailBlock(label, value, fallback) {
+    return `
+      <div class="cake-detail">
+        <span>${label}</span>
+        <p>${escapeHTML(cleanDetail(value, fallback))}</p>
+      </div>
+    `;
+  }
+
+  function safeHttpUrl(value) {
+    try {
+      const url = new URL(String(value || ""));
+      return ["https:", "http:"].includes(url.protocol)
+        ? url.href
+        : "";
+    } catch {
+      return "";
+    }
   }
 
   cakeOrdersTable.innerHTML = cakeRequests.map(request => {
     const id = escapeHTML(request.id);
-    const name = escapeHTML(request.customer_name || "Unnamed customer");
-    const phone = escapeHTML(request.customer_phone || "No phone");
-    const type = escapeHTML(request.cake_type || "Custom cake");
-    const size = escapeHTML(request.size || "Not specified");
-    const flavour = escapeHTML(request.flavour || "Not specified");
-    const message = escapeHTML(request.message_on_cake || "None");
-    const requirements = escapeHTML(request.requirements || "None");
-    const notes = escapeHTML(request.staff_notes || "");
+    const name = escapeHTML(
+      cleanDetail(request.customer_name, "Unnamed customer")
+    );
+    const phone = escapeHTML(
+      cleanDetail(request.customer_phone, "No phone provided")
+    );
     const status = CAKE_STATUSES.includes(request.status)
       ? request.status
       : "New";
+    const notes = escapeHTML(request.staff_notes || "");
+    const referenceUrl = safeHttpUrl(request.reference_image_url);
 
-    const imageLink = request.reference_image_url
-      ? `<a href="${escapeHTML(request.reference_image_url)}" target="_blank" rel="noopener noreferrer">View image ↗</a>`
-      : "No image";
+    const statusClass = status.toLowerCase().replace(/[^a-z]+/g, "-");
 
     const statusOptions = CAKE_STATUSES.map(option => `
-      <option value="${escapeHTML(option)}" ${option === status ? "selected" : ""}>
+      <option value="${escapeHTML(option)}"
+        ${option === status ? "selected" : ""}>
         ${escapeHTML(option)}
       </option>
     `).join("");
 
+    const imageMarkup = referenceUrl
+      ? `
+        <a class="cake-reference-link"
+           href="${escapeHTML(referenceUrl)}"
+           target="_blank"
+           rel="noopener noreferrer">
+          <img src="${escapeHTML(referenceUrl)}"
+               alt="Customer's cake reference"
+               loading="lazy"
+               referrerpolicy="no-referrer">
+          <span>View reference image ↗</span>
+        </a>
+      `
+      : `<p class="cake-muted">No reference image attached</p>`;
+
     return `
-      <tr data-cake-request="${id}">
-        <td>
-          <strong>${name}</strong>
-          <p>${phone}</p>
+      <tr class="cake-order-row" data-cake-request="${id}">
+        <td colspan="6">
+          <article class="cake-order-card">
+            <header class="cake-order-header">
+              <div class="cake-customer">
+                <span class="cake-order-icon" aria-hidden="true">🎂</span>
+                <div>
+                  <p class="cake-eyebrow">CUSTOM CAKE REQUEST</p>
+                  <h3>${name}</h3>
+                  <a class="cake-phone"
+                     href="tel:${escapeHTML(String(request.customer_phone || "").replace(/[^\d+]/g, ""))}">
+                    ${phone}
+                  </a>
+                </div>
+              </div>
+
+              <span class="cake-status-badge cake-status-${statusClass}">
+                ${escapeHTML(status)}
+              </span>
+            </header>
+
+            <div class="cake-order-grid">
+              <section class="cake-order-section">
+                <h4>Cake specifications</h4>
+                ${detailBlock("Cake type", request.cake_type, "Custom cake")}
+                ${detailBlock("Size", request.size)}
+                ${detailBlock("Flavour", request.flavour)}
+                ${detailBlock("Message on cake", request.message_on_cake, "No message")}
+              </section>
+
+              <section class="cake-order-section">
+                <h4>Customer requirements</h4>
+                <div class="cake-requirements">
+                  ${escapeHTML(cleanDetail(request.requirements, "No additional requirements provided."))}
+                </div>
+              </section>
+
+              <section class="cake-order-section">
+                <h4>Preferred date</h4>
+                <p class="cake-date">
+                  ${escapeHTML(formatCakeDate(request.preferred_date))}
+                </p>
+                <h4 class="cake-reference-heading">Reference</h4>
+                ${imageMarkup}
+                <p class="cake-submitted">
+                  Submitted ${escapeHTML(formatCakeTimestamp(request.created_at))}
+                </p>
+              </section>
+
+              <section class="cake-order-section cake-admin-section">
+                <h4>Staff controls</h4>
+
+                <label class="cake-field-label">
+                  Order status
+                  <select data-cake-status>
+                    ${statusOptions}
+                  </select>
+                </label>
+
+                <label class="cake-field-label">
+                  Private staff notes
+                  <textarea data-cake-notes
+                    rows="4"
+                    maxlength="2000"
+                    placeholder="Internal notes for staff">${notes}</textarea>
+                </label>
+
+                <button type="button" class="cake-save-button" data-save-cake>
+                  Save changes
+                </button>
+              </section>
+            </div>
+          </article>
         </td>
-        <td>
-          <strong>${type}</strong>
-          <p>Size: ${size}</p>
-          <p>Flavour: ${flavour}</p>
-          <p>Message: ${message}</p>
-          <p>Requirements: ${requirements}</p>
-        </td>
-        <td>${escapeHTML(formatCakeDate(request.preferred_date))}</td>
-        <td>${imageLink}</td>
-        <td>
-          <label>
-            Status
-            <select data-cake-status>
-              ${statusOptions}
-            </select>
-          </label>
-          <label>
-            Private staff notes
-            <textarea data-cake-notes rows="3" maxlength="2000" placeholder="Internal notes for staff">${notes}</textarea>
-          </label>
-          <button type="button" data-save-cake>Save changes</button>
-        </td>
-        <td>${escapeHTML(formatCakeTimestamp(request.created_at))}</td>
       </tr>
     `;
   }).join("");
 }
+
 
 async function saveCakeRequest(button) {
   if (isSavingCakeRequest) return;
