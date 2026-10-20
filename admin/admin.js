@@ -302,7 +302,6 @@ async function verifyAdmin(user) {
       currentAdminProfile = null;
 
       await supabaseClient.auth.signOut();
-
       showAuth();
 
       setMessage(
@@ -408,11 +407,7 @@ function setupNavigation() {
 }
 
 async function loadDashboardData() {
-  await Promise.all([
-    loadCategories(),
-    loadProducts()
-  ]);
-
+  await Promise.all([loadCategories(), loadProducts()]);
   updateStats();
   renderProducts();
 }
@@ -428,7 +423,6 @@ async function loadCategories() {
 
   if (error) {
     console.error("Category loading failed:", error);
-
     categories = [];
     populateCategoryOptions();
 
@@ -553,25 +547,11 @@ function getFilteredProducts() {
 
     let matchesFilter = true;
 
-    if (filter === "available") {
-      matchesFilter = product.available === true;
-    }
-
-    if (filter === "unavailable") {
-      matchesFilter = product.available === false;
-    }
-
-    if (filter === "visible") {
-      matchesFilter = product.visible === true;
-    }
-
-    if (filter === "hidden") {
-      matchesFilter = product.visible === false;
-    }
-
-    if (filter === "featured") {
-      matchesFilter = product.featured === true;
-    }
+    if (filter === "available") matchesFilter = product.available === true;
+    if (filter === "unavailable") matchesFilter = product.available === false;
+    if (filter === "visible") matchesFilter = product.visible === true;
+    if (filter === "hidden") matchesFilter = product.visible === false;
+    if (filter === "featured") matchesFilter = product.featured === true;
 
     return matchesSearch && matchesFilter;
   });
@@ -651,13 +631,8 @@ function openProductDialog(product = null) {
   currentImageFile = null;
   currentImageUrl = product?.image_url || "";
 
-  if (productId) {
-    productId.value = product ? String(product.id) : "";
-  }
-
-  if (productName) {
-    productName.value = product?.name || "";
-  }
+  if (productId) productId.value = product ? String(product.id) : "";
+  if (productName) productName.value = product?.name || "";
 
   if (productPrice) {
     productPrice.value = product
@@ -670,15 +645,11 @@ function openProductDialog(product = null) {
   }
 
   if (productAvailable) {
-    productAvailable.checked = product
-      ? product.available === true
-      : true;
+    productAvailable.checked = product ? product.available === true : true;
   }
 
   if (productVisible) {
-    productVisible.checked = product
-      ? product.visible === true
-      : true;
+    productVisible.checked = product ? product.visible === true : true;
   }
 
   if (productFeatured) {
@@ -738,7 +709,6 @@ function handleImageChange() {
     if (!currentImageFile.type.startsWith("image/")) {
       currentImageFile = null;
       productImage.value = "";
-
       setMessage(formMessage, "Please select an image file.", "error");
       return;
     }
@@ -746,7 +716,6 @@ function handleImageChange() {
     if (currentImageFile.size > 5 * 1024 * 1024) {
       currentImageFile = null;
       productImage.value = "";
-
       setMessage(formMessage, "Image must be 5 MB or smaller.", "error");
       return;
     }
@@ -773,9 +742,7 @@ function handleImageChange() {
   currentImageUrl = url;
 
   if (imageStatus) {
-    imageStatus.textContent = url
-      ? "Image URL entered."
-      : "No image selected.";
+    imageStatus.textContent = url ? "Image URL entered." : "No image selected.";
   }
 }
 
@@ -860,7 +827,12 @@ async function handleProductSave(event) {
   }
 
   if (!getCategoryById(categoryId)) {
-    setMessage(formMessage, "The selected category no longer exists. Reload categories and try again.", "error");
+    setMessage(
+      formMessage,
+      "The selected category no longer exists. Reload categories and try again.",
+      "error"
+    );
+
     return;
   }
 
@@ -1053,9 +1025,7 @@ function formatCakeDate(value) {
 
   const date = new Date(`${value}T00:00:00`);
 
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
+  if (Number.isNaN(date.getTime())) return value;
 
   return date.toLocaleDateString("en-IN", {
     day: "numeric",
@@ -1069,9 +1039,7 @@ function formatCakeTimestamp(value) {
 
   const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
-    return "—";
-  }
+  if (Number.isNaN(date.getTime())) return "—";
 
   return date.toLocaleString("en-IN", {
     dateStyle: "medium",
@@ -1080,8 +1048,7 @@ function formatCakeTimestamp(value) {
 }
 
 async function loadCakeRequests() {
-  if (!cakeOrdersTable || !supabaseClient) return;
-  if (isLoadingCakeRequests) return;
+  if (!cakeOrdersTable || !supabaseClient || isLoadingCakeRequests) return;
 
   if (!currentUser || !currentAdminProfile) {
     setMessage(
@@ -1142,7 +1109,6 @@ async function loadCakeRequests() {
   }
 }
 
-
 function renderCakeRequests() {
   if (!cakeOrdersTable) return;
 
@@ -1154,6 +1120,7 @@ function renderCakeRequests() {
         </td>
       </tr>
     `;
+
     return;
   }
 
@@ -1184,9 +1151,7 @@ function renderCakeRequests() {
   function safeHttpUrl(value) {
     try {
       const url = new URL(String(value || ""));
-      return ["https:", "http:"].includes(url.protocol)
-        ? url.href
-        : "";
+      return ["https:", "http:"].includes(url.protocol) ? url.href : "";
     } catch {
       return "";
     }
@@ -1200,12 +1165,13 @@ function renderCakeRequests() {
     const phone = escapeHTML(
       cleanDetail(request.customer_phone, "No phone provided")
     );
+
     const status = CAKE_STATUSES.includes(request.status)
       ? request.status
       : "New";
+
     const notes = escapeHTML(request.staff_notes || "");
     const referenceUrl = safeHttpUrl(request.reference_image_url);
-
     const statusClass = status.toLowerCase().replace(/[^a-z]+/g, "-");
 
     const statusOptions = CAKE_STATUSES.map(option => `
@@ -1229,6 +1195,8 @@ function renderCakeRequests() {
         </a>
       `
       : `<p class="cake-muted">No reference image attached</p>`;
+
+    const completed = status === "Completed";
 
     return `
       <tr class="cake-order-row" data-cake-request="${id}">
@@ -1273,8 +1241,10 @@ function renderCakeRequests() {
                 <p class="cake-date">
                   ${escapeHTML(formatCakeDate(request.preferred_date))}
                 </p>
+
                 <h4 class="cake-reference-heading">Reference</h4>
                 ${imageMarkup}
+
                 <p class="cake-submitted">
                   Submitted ${escapeHTML(formatCakeTimestamp(request.created_at))}
                 </p>
@@ -1298,9 +1268,25 @@ function renderCakeRequests() {
                     placeholder="Internal notes for staff">${notes}</textarea>
                 </label>
 
-                <button type="button" class="cake-save-button" data-save-cake>
-                  Save changes
-                </button>
+                <div class="cake-action-buttons">
+                  <button
+                    type="button"
+                    class="cake-save-button"
+                    data-save-cake
+                    ${completed ? "disabled" : ""}
+                  >
+                    ${completed ? "Changes saved" : "Save changes"}
+                  </button>
+
+                  <button
+                    type="button"
+                    class="cake-complete-button"
+                    data-complete-cake
+                    ${completed ? "disabled" : ""}
+                  >
+                    ${completed ? "✓ Completed" : "✓ Mark Completed"}
+                  </button>
+                </div>
               </section>
             </div>
           </article>
@@ -1310,8 +1296,7 @@ function renderCakeRequests() {
   }).join("");
 }
 
-
-async function saveCakeRequest(button) {
+async function saveCakeRequest(button, markCompleted = false) {
   if (isSavingCakeRequest) return;
 
   if (!currentUser || !currentAdminProfile || !supabaseClient) {
@@ -1320,7 +1305,6 @@ async function saveCakeRequest(button) {
   }
 
   const row = button.closest("[data-cake-request]");
-
   if (!row) return;
 
   const id = row.dataset.cakeRequest;
@@ -1328,6 +1312,10 @@ async function saveCakeRequest(button) {
   const notesInput = row.querySelector("[data-cake-notes]");
 
   if (!statusInput || !notesInput) return;
+
+  if (markCompleted) {
+    statusInput.value = "Completed";
+  }
 
   if (!CAKE_STATUSES.includes(statusInput.value)) {
     alert("Select a valid cake request status.");
@@ -1337,8 +1325,15 @@ async function saveCakeRequest(button) {
   isSavingCakeRequest = true;
 
   const originalText = button.textContent;
-  button.disabled = true;
-  button.textContent = "Saving...";
+  const buttons = row.querySelectorAll(
+    "[data-save-cake], [data-complete-cake]"
+  );
+
+  buttons.forEach(item => {
+    item.disabled = true;
+  });
+
+  button.textContent = markCompleted ? "Completing..." : "Saving...";
 
   try {
     const payload = {
@@ -1372,9 +1367,13 @@ async function saveCakeRequest(button) {
       request.updated_at = payload.updated_at;
     }
 
+    renderCakeRequests();
+
     setMessage(
       globalMessage || authMessage,
-      "Cake request updated successfully.",
+      markCompleted
+        ? "Cake request marked as completed."
+        : "Cake request updated successfully.",
       "success"
     );
   } catch (error) {
@@ -1383,10 +1382,14 @@ async function saveCakeRequest(button) {
     alert(
       "Could not save the cake request.\n\n" + getErrorMessage(error)
     );
+
+    buttons.forEach(item => {
+      item.disabled = false;
+    });
+
+    button.textContent = originalText || "Save changes";
   } finally {
     isSavingCakeRequest = false;
-    button.disabled = false;
-    button.textContent = originalText || "Save changes";
   }
 }
 
@@ -1412,10 +1415,36 @@ function setupEventListeners() {
   refreshCakeOrdersButton?.addEventListener("click", loadCakeRequests);
 
   cakeOrdersTable?.addEventListener("click", event => {
-    const button = event.target.closest("[data-save-cake]");
+    const target = event.target;
 
-    if (button && cakeOrdersTable.contains(button)) {
-      saveCakeRequest(button);
+    if (!(target instanceof Element)) return;
+
+    const saveButton = target.closest("[data-save-cake]");
+    const completeButton = target.closest("[data-complete-cake]");
+
+    if (saveButton && cakeOrdersTable.contains(saveButton)) {
+      saveCakeRequest(saveButton, false);
+      return;
+    }
+
+    if (completeButton && cakeOrdersTable.contains(completeButton)) {
+      const row = completeButton.closest("[data-cake-request]");
+      const statusInput = row?.querySelector("[data-cake-status]");
+
+      if (!row || !statusInput) return;
+
+      if (statusInput.value === "Completed") {
+        saveCakeRequest(completeButton, true);
+        return;
+      }
+
+      const confirmed = window.confirm(
+        "Mark this custom cake request as completed?"
+      );
+
+      if (confirmed) {
+        saveCakeRequest(completeButton, true);
+      }
     }
   });
 

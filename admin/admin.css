@@ -1133,3 +1133,30 @@ dialog::backdrop {
     max-width: 100%;
   }
 }
+
+.cake-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.cake-complete-button {
+  border: 1px solid #15803d;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #15803d;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cake-complete-button:hover:not(:disabled) {
+  background: #166534;
+}
+
+.cake-complete-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
